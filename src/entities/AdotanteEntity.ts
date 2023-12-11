@@ -1,4 +1,3 @@
-// AdotanteEntity.ts
 import {
   Column,
   Entity,
@@ -16,21 +15,21 @@ export default class AdotanteEntity {
   @Column()
   celular: string;
   @Column()
-  foto: string;
+  foto?: string;
   @Column()
-  endereco: string;
+  endereco?: string;
 
   constructor(
     nome: string,
     senha: string,
     celular: string,
-    foto: string,
-    endereco: string
+    foto?: string,
+    endereco?: string
   ) {
     this.nome = nome;
     this.senha = senha;
-    this.foto = foto;
     this.celular = celular;
+    this.foto = foto;
     this.endereco = endereco;
   }
 }
