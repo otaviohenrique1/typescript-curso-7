@@ -3,6 +3,7 @@ import type TipoPet from "../tipos/TipoPet";
 import EnumEspecie from "../enum/EnumEspecie";
 import PetRepository from "../repositories/PetRepository";
 import PetEntity from "../entities/PetEntity";
+import EnumPorte from "../enum/EnumPorte";
 
 let id = 0;
 function geraId() {
@@ -13,14 +14,20 @@ function geraId() {
 let listaDePets: Array<TipoPet> = [];
 
 export default class PetController {
-  constructor(private repository: PetRepository) {}
+  constructor(private repository: PetRepository) { }
 
   async criaPet(req: Request, res: Response) {
-    const { adotado, especie, dataDeNascimento, nome } = <PetEntity>req.body;
+    const { adotado, especie, porte, dataDeNascimento, nome } = <PetEntity>req.body;
+
     if (!Object.values(EnumEspecie).includes(especie)) {
       return res.status(400).json({ error: "Especie inválida" });
     }
-    const novoPet = new PetEntity(nome, especie, dataDeNascimento, adotado);
+
+    if (porte && !(porte in EnumPorte)) {
+      return res.status(400).json({ error: "Porte inválido" });
+    }
+
+    const novoPet = new PetEntity(nome, especie, dataDeNascimento, adotado, porte);
 
     await this.repository.criaPet(novoPet);
     return res.status(201).json(novoPet)
@@ -37,7 +44,7 @@ export default class PetController {
       Number(id),
       req.body as PetEntity
     );
-  
+
     if (!success) {
       return res.status(404).json({ message });
     }
@@ -65,5 +72,11 @@ export default class PetController {
       return res.status(404).json({ message });
     }
     return res.sendStatus(204);
+  }
+
+  async buscaPetPeloPorte(req: Request, res: Response) {
+    const { porte } = req.query;
+    const listaDePets = await this.repository.buscaPetPeloPorte(porte as EnumPorte);
+    return res.status(200).json(listaDePets);
   }
 }
